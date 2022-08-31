@@ -12,7 +12,6 @@ import java.nio.file.Files;
 
 public class SevenZUtils {
 
-
     public static final String postfix = ".7z";
 
     public static final String separator = "/";
