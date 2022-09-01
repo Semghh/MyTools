@@ -1,9 +1,6 @@
-package com.semghh;
+package com.semghh.ReplaceUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -126,10 +123,9 @@ public class ReplaceUtils {
 
     /**
      * 泛用性更高一点儿的方法
-     *
-     *
+     * <p>
+     * <p>
      * 通过groupPattern 匹配出一个group ,NameResolver提供一个getName方法,会传入原始Group的字符串。 需要开发者提供这个group对应的name
-     *
      *
      * @param groupPattern       匹配一个Group的正则
      * @param srcPattern         需要替换的正则
@@ -138,12 +134,8 @@ public class ReplaceUtils {
      * @param resFile            输出结果
      * @param resolver           name解决器,从原始group中提取出对应name名
      */
-    public static void replaceByField(String groupPattern,
-                                      String srcPattern,
-                                      File sourceFile,
-                                      File replacePatternFile,
-                                      File resFile,
-                                      NameResolver resolver) {
+    public static void replaceByField(String groupPattern, String srcPattern, File sourceFile, File replacePatternFile,
+                                      File resFile, NameResolver resolver) {
 
         try (FileInputStream fisa = new FileInputStream(sourceFile);
              FileInputStream fisb = new FileInputStream(replacePatternFile);
@@ -162,36 +154,25 @@ public class ReplaceUtils {
 
             pattern = Pattern.compile(groupPattern);
             matcher = pattern.matcher(strA);
-            while (matcher.find()) {
-                String originGroup = matcher.group();
-                String nameFromGroup = resolver.getNameFromGroup(originGroup);
-                //如果存在对应的name
-                if (nameFromGroup!=null && nameToReplacePattern.containsKey(nameFromGroup)) {
-                    String s = originGroup.replaceAll(srcPattern, nameToReplacePattern.get(nameFromGroup));
-                    strA = strA.replace(originGroup, s);
-                }
-            }
-            fops.write(strA.getBytes(StandardCharsets.UTF_8));
+            doReplace(srcPattern, resolver, fops, nameToReplacePattern, strA, matcher);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
 
-
     /**
      * 泛用性更高一点儿的方法
-     *
-     *
+     * <p>
+     * <p>
      * 通过groupPattern 匹配出一个group ,NameResolver提供一个getName方法,会传入原始Group的字符串。 需要开发者提供这个group对应的name
      *
-     *
-     * @param groupPattern          匹配一个Group的正则
-     * @param srcPattern            需要替换的正则
-     * @param sourceFile            源结构文件
-     * @param resFile               输出结果
-     * @param resolver              name解决器,从原始group中提取出对应name名
-     * @param replaceFileResolver   替换文本解决器,返回一个Map<String,String> key为name value为对应的替换文本
+     * @param groupPattern        匹配一个Group的正则
+     * @param srcPattern          需要替换的正则
+     * @param sourceFile          源结构文件
+     * @param resFile             输出结果
+     * @param resolver            name解决器,从原始group中提取出对应name名
+     * @param replaceFileResolver 替换文本解决器,返回一个Map<String,String> key为name value为对应的替换文本
      */
     public static void replaceByField(String groupPattern,
                                       String srcPattern,
@@ -206,20 +187,81 @@ public class ReplaceUtils {
             String strA = new String(fisa.readAllBytes());
             Pattern pattern = Pattern.compile(groupPattern);
             Matcher matcher = pattern.matcher(strA);
-            while (matcher.find()) {
-                String originGroup = matcher.group();
-                String nameFromGroup = resolver.getNameFromGroup(originGroup);
-                //如果存在对应的name
-                if (nameFromGroup!=null && nameToReplacePattern.containsKey(nameFromGroup)) {
-                    String s = originGroup.replaceAll(srcPattern, nameToReplacePattern.get(nameFromGroup));
-                    strA = strA.replace(originGroup, s);
-                }
-            }
-            fops.write(strA.getBytes(StandardCharsets.UTF_8));
+            doReplace(srcPattern, resolver, fops, nameToReplacePattern, strA, matcher);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+    private static void doReplace(String srcPattern, NameResolver resolver,
+                                  FileOutputStream fops, Map<String, String> nameToReplacePattern,
+                                  String strA, Matcher matcher) throws IOException {
+        while (matcher.find()) {
+            String originGroup = matcher.group();
+            String nameFromGroup = resolver.getNameFromGroup(originGroup);
+            //如果存在对应的name
+            if (nameFromGroup != null && nameToReplacePattern.containsKey(nameFromGroup)) {
+                String s = originGroup.replaceAll(srcPattern, nameToReplacePattern.get(nameFromGroup));
+                strA = strA.replace(originGroup, s);
+            }
+        }
+        fops.write(strA.getBytes(StandardCharsets.UTF_8));
+    }
+
+
+    /**
+     * 指定Dir下全部文件按照指定的 pattern全部替换为 replaceText
+     *
+     * @param dirFile     指定的Dir
+     * @param pattern     指定的pattern
+     * @param replaceText 指定的替换字段
+     */
+    public static void replaceDirAllPattern(File dirFile, String pattern, String replaceText) {
+
+        if (!dirFile.isDirectory()) return;
+        File[] files = dirFile.listFiles();
+        if (files == null) return;
+        for (File file : files) {
+            recursionWithReplaceAction(file, pattern, replaceText);
+        }
+    }
+
+    private static void recursionWithReplaceAction(File file, String pattern, String replaceText) {
+        if (file == null) return;
+        if (file.isFile()) {
+            try (FileInputStream fis = new FileInputStream(file);) {
+                String s = new String(fis.readAllBytes()).replaceAll(pattern, replaceText);
+                try (FileOutputStream fos = new FileOutputStream(file)) {
+                    fos.write(s.getBytes(StandardCharsets.UTF_8));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (file.isDirectory()) {
+            File[] children = file.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    recursionWithReplaceAction(child, pattern, replaceText);
+                }
+            }
+        }
+    }
+
+
+    public static void recursionWithAction(File file, FileAction action) {
+        if (file == null) return;
+        if (file.isFile() && action.apply(file)) {
+            action.action(file);
+        } else if (file.isDirectory()) {
+            File[] children = file.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    recursionWithAction(child, action);
+                }
+            }
+        }
+    }
+
 
     /**
      * 下划线 kebabCase 转化为 小驼峰式 CamelCase
@@ -271,14 +313,12 @@ public class ReplaceUtils {
 
     public interface NameResolver {
         public String getNameFromGroup(String group);
-
     }
 
 
-    public interface ReplaceFileResolver{
-
-        public Map<String,String> getNameToReplaceText();
-
+    public interface ReplaceFileResolver {
+        public Map<String, String> getNameToReplaceText();
     }
+
 
 }
