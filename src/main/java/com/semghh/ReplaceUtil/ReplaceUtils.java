@@ -138,7 +138,7 @@ public class ReplaceUtils {
      * @param resolver           name解决器,从原始group中提取出对应name名
      */
     public static void replaceByField(String groupPattern, String srcPattern, File sourceFile, File replacePatternFile,
-                                      File resFile, NameResolver resolver) {
+                                      File resFile, SlotNameResolver resolver) {
 
         try (FileInputStream fisa = new FileInputStream(sourceFile);
              FileInputStream fisb = new FileInputStream(replacePatternFile);
@@ -175,28 +175,28 @@ public class ReplaceUtils {
      * @param sourceFile          源结构文件
      * @param resFile             输出结果
      * @param resolver            name解决器,从原始group中提取出对应name名
-     * @param replaceFileResolver 替换文本解决器,返回一个Map<String,String> key为name value为对应的替换文本
+     * @param replaceFileNameMappingResolver 替换文本解决器,返回一个Map<String,String> key为name value为对应的替换文本
      */
     public static void replaceByField(String groupPattern,
                                       String srcPattern,
                                       File sourceFile,
                                       File resFile,
-                                      NameResolver resolver,
-                                      ReplaceFileResolver replaceFileResolver) {
+                                      SlotNameResolver resolver,
+                                      ReplaceFileNameMappingResolver replaceFileNameMappingResolver) {
 
         try (FileInputStream fisa = new FileInputStream(sourceFile);
              FileOutputStream fops = new FileOutputStream(resFile)) {
-            Map<String, String> nameToReplacePattern = replaceFileResolver.getNameToReplaceText();
+            Map<String, String> nameFromReplacePattern = replaceFileNameMappingResolver.getNameMappingFromReplaceText();
             String strA = new String(fisa.readAllBytes());
             Pattern pattern = Pattern.compile(groupPattern);
             Matcher matcher = pattern.matcher(strA);
-            doReplace(srcPattern, resolver, fops, nameToReplacePattern, strA, matcher);
+            doReplace(srcPattern, resolver, fops, nameFromReplacePattern, strA, matcher);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void doReplace(String srcPattern, NameResolver resolver,
+    private static void doReplace(String srcPattern, SlotNameResolver resolver,
                                   FileOutputStream fops, Map<String, String> nameToReplacePattern,
                                   String strA, Matcher matcher) throws IOException {
         while (matcher.find()) {
@@ -309,7 +309,7 @@ public class ReplaceUtils {
     /**
      * 小驼峰式 CamelCase 转化为 kebabCase
      */
-    public static String CamelCaseToKebabCase(String camelCase) {
+    public static String camelCaseToKebabCase(String camelCase) {
         char[] chars = camelCase.toCharArray();
         StringBuilder sb = new StringBuilder();
         if (isUpperCase(chars[0])) {
@@ -335,9 +335,6 @@ public class ReplaceUtils {
 
 
 
-    public interface ReplaceFileResolver {
-        public Map<String, String> getNameToReplaceText();
-    }
 
 
 }

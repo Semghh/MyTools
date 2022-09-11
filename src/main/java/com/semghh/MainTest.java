@@ -5,7 +5,7 @@ import com.semghh.ConsoleFormat.BackgroundColor;
 import com.semghh.ConsoleFormat.ConsoleFormatUtils;
 import com.semghh.ConsoleFormat.FontColor;
 import com.semghh.ConsoleFormat.FontStyle;
-import com.semghh.ReplaceUtil.NameResolver;
+import com.semghh.ReplaceUtil.SlotNameResolver;
 import com.semghh.ReplaceUtil.ReplaceUtils;
 import com.semghh.ReplaceUtil.SimpleReplaceFileAction;
 import org.junit.Test;
@@ -68,7 +68,7 @@ public class MainTest {
     @Test
     public void replaceThead() {
         String groupPattern1 = "<th data-options=\"field:'.*'.*>%</th>";
-        NameResolver nameResolver = new NameResolver() {
+        SlotNameResolver slotNameResolver = new SlotNameResolver() {
             @Override
             public String getNameFromGroup(String group) {
                 //<th data-options="field:'netuserId',width:150,tip:true"></th>
@@ -81,7 +81,7 @@ public class MainTest {
                 return null;
             }
         };
-        ReplaceUtils.replaceByField(groupPattern1, "%", srcFile, replaceFile, resFile, nameResolver);
+        ReplaceUtils.replaceByField(groupPattern1, "%", srcFile, replaceFile, resFile, slotNameResolver);
     }
 
     /**

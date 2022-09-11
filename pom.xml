@@ -6,7 +6,8 @@
 
     <groupId>xyz.semghh</groupId>
     <artifactId>MyTools</artifactId>
-    <version>0.0.1</version>
+    <description>SNAPSHOT</description>
+    <version>0.0.2</version>
 
     <dependencies>
         <dependency>
