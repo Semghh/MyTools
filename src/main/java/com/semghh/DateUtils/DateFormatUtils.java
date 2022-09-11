@@ -1,10 +1,14 @@
-package com.semghh;
+package com.semghh.DateUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class DateUtils {
+/**
+ * @2022年9月9日11点03分
+ * @author SemgHH
+ */
+public class DateFormatUtils {
 
     public static final int YEAR = Calendar.YEAR;
     public static final int MONTH = Calendar.MONTH;
@@ -18,6 +22,12 @@ public class DateUtils {
         return sdf.format(date);
     }
 
+    public static String formatByPattern(FormatPattern pattern, Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern.getPattern());
+        return sdf.format(date);
+    }
+
+
     public static String formatByPattern(String pattern) {
         return formatByPattern(pattern, new Date());
     }
@@ -30,8 +40,27 @@ public class DateUtils {
     }
 
     public static DateOperation adjustDate() {
-        return DateUtils.adjustDate(new Date());
+        return DateFormatUtils.adjustDate(new Date());
     }
+
+
+    public static Date parseDateString(FormatPattern pattern,String text){
+        switch (pattern){
+            case hyphen_1 -> {
+
+            }
+
+            default -> {
+
+            }
+        }
+        return null;
+    }
+
+
+
+
+
 
 
     public static class DateOperation {
@@ -58,7 +87,7 @@ public class DateUtils {
             return calendar.getTime();
         }
         public String formatByPattern(String pattern){
-            return DateUtils.formatByPattern(pattern,calendar.getTime());
+            return DateFormatUtils.formatByPattern(pattern,calendar.getTime());
         }
 
 

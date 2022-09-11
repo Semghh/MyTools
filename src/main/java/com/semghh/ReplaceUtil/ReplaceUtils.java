@@ -8,6 +8,9 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author SemgHH
+ */
 public class ReplaceUtils {
 
 
@@ -94,7 +97,7 @@ public class ReplaceUtils {
                 String group = matcher.group();
                 String[] split = group.split("\"");
                 String[] split1 = group.split("'");
-                nameToReplacePattern.put(kebabCaseToCamelCase(split[1]), split1[1]);
+                nameToReplacePattern.put(kebabCaseToLowerCamelCase(split[1]), split1[1]);
             }
             String strA = new String(fisa.readAllBytes());
 
@@ -148,7 +151,7 @@ public class ReplaceUtils {
                 String group = matcher.group();
                 String[] split = group.split("\"");
                 String[] split1 = group.split("'");
-                nameToReplacePattern.put(kebabCaseToCamelCase(split[1]), split1[1]);
+                nameToReplacePattern.put(kebabCaseToLowerCamelCase(split[1]), split1[1]);
             }
             String strA = new String(fisa.readAllBytes());
 
@@ -218,18 +221,24 @@ public class ReplaceUtils {
      */
     public static void replaceDirAllPattern(File dirFile, String pattern, String replaceText) {
 
-        if (!dirFile.isDirectory()) return;
+        if (!dirFile.isDirectory()) {
+            return;
+        }
         File[] files = dirFile.listFiles();
-        if (files == null) return;
+        if (files == null) {
+            return;
+        }
         for (File file : files) {
             recursionWithReplaceAction(file, pattern, replaceText);
         }
     }
 
     private static void recursionWithReplaceAction(File file, String pattern, String replaceText) {
-        if (file == null) return;
+        if (file == null) {
+            return;
+        }
         if (file.isFile()) {
-            try (FileInputStream fis = new FileInputStream(file);) {
+            try (FileInputStream fis = new FileInputStream(file)) {
                 String s = new String(fis.readAllBytes()).replaceAll(pattern, replaceText);
                 try (FileOutputStream fos = new FileOutputStream(file)) {
                     fos.write(s.getBytes(StandardCharsets.UTF_8));
@@ -249,7 +258,9 @@ public class ReplaceUtils {
 
 
     public static void recursionWithAction(File file, FileAction action) {
-        if (file == null) return;
+        if (file == null) {
+            return;
+        }
         if (file.isFile() && action.apply(file)) {
             action.action(file);
         } else if (file.isDirectory()) {
@@ -264,9 +275,9 @@ public class ReplaceUtils {
 
 
     /**
-     * 下划线 kebabCase 转化为 小驼峰式 CamelCase
+     * 下划线 kebabCase 转化为 小驼峰式 LowerCamelCase
      */
-    public static String kebabCaseToCamelCase(String kebabCase) {
+    public static String kebabCaseToLowerCamelCase(String kebabCase) {
         String[] split = kebabCase.split("_");
 
         StringBuilder sb = new StringBuilder();
@@ -281,7 +292,18 @@ public class ReplaceUtils {
             sb.append((s.charAt(0) + "").toUpperCase());
             sb.append(s.substring(1));
         }
+        if (kebabCase.charAt(kebabCase.length()-1)=='_'){
+            sb.append("_");
+        }
         return sb.toString();
+    }
+
+    /**
+     * 下划线 kebabCase 转化为大驼峰 UpperCamelCase
+     */
+    public static String kebabCaceToUpperCamelCase(String kebabCase){
+        String s = kebabCaseToLowerCamelCase(kebabCase);
+        return s.substring(0,1).toUpperCase()+s.substring(1);
     }
 
     /**
@@ -311,9 +333,6 @@ public class ReplaceUtils {
     }
 
 
-    public interface NameResolver {
-        public String getNameFromGroup(String group);
-    }
 
 
     public interface ReplaceFileResolver {
