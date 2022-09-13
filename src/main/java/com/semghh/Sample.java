@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class MainTest {
+public class Sample {
 
     static File srcFile = new File("C:\\Users\\SemgHH\\Desktop\\a.txt");
     static File replaceFile = new File("C:\\Users\\SemgHH\\Desktop\\b.txt");
@@ -72,7 +72,6 @@ public class MainTest {
             @Override
             public String getNameFromGroup(String group) {
                 //<th data-options="field:'netuserId',width:150,tip:true"></th>
-
                 Pattern pattern = Pattern.compile("field:'.*'");
                 Matcher matcher = pattern.matcher(group);
                 if (matcher.find()) {

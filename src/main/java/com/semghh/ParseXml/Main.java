@@ -11,7 +11,9 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Properties;
 
 /**
  * @author SemgHH
@@ -22,10 +24,16 @@ public class Main {
 
     public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
 
-        File file = new File("src/main/resources/my.xml");
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        SAXParser saxParser = factory.newSAXParser();
-        saxParser.parse(file,new MyHandler());
+//        File file = new File("src/main/resources/my.xml");
+//        SAXParserFactory factory = SAXParserFactory.newInstance();
+//        SAXParser saxParser = factory.newSAXParser();
+//        saxParser.parse(file,new MyHandler());
+
+//        System.out.println(System.getProperties());
+        File file = new File(new File("").getAbsolutePath());
+        File[] files = file.listFiles();
+        System.out.println(Arrays.toString(files));
+
 
     }
 
