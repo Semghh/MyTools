@@ -91,7 +91,7 @@ public class ReplaceUtils {
             HashMap<String, String> nameToReplacePattern = new HashMap<>();
 
             Pattern pattern = Pattern.compile("\".*\" IS '.*'");
-            String strB = new String(fisb.readAllBytes());
+            String strB = new String(fisb.readAllBytes(), StandardCharsets.UTF_8);
             Matcher matcher = pattern.matcher(strB);
             while (matcher.find()) {
                 String group = matcher.group();
