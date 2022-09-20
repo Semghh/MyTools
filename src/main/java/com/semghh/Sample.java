@@ -11,6 +11,7 @@ import com.semghh.ReplaceUtil.SimpleReplaceFileAction;
 import org.junit.Test;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,7 +60,7 @@ public class Sample {
     public void ReplaceTable() {
 
         String groupPattern = "<td class=\"字段\">�\\?</td>\r*\n*\t*<td>\r*\n*\t*<input name=\".*\" type=\"text\" class=\"w180\"/>";
-        ReplaceUtils.replaceByField(groupPattern, srcPattern, srcFile, replaceFile, resFile);
+        ReplaceUtils.replaceByField(groupPattern, "�\\?", srcFile, replaceFile, resFile);
     }
 
     /**
@@ -88,15 +89,34 @@ public class Sample {
      */
     @Test
     public void replaceClassName() {
-        //按照指定正则,替换文件夹下所有文件,
-        File srcDir = new File("C:\\Users\\SemgHH\\Desktop\\a");
-        ReplaceUtils.recursionWithAction(srcDir, new SimpleReplaceFileAction("Resview.tdMBusOppoPower", "TdMBusOppoPower"));
+        //按照指定正则,替换文件夹下所有文件内,  srcPattern为 replaceText
+        File srcDir = new File("E:\\gen");
+        ReplaceUtils.recursionWithAction(srcDir, new SimpleReplaceFileAction("Resview.tfPlmResearchCountryroom", "TfPlmResearchCountryroom"));
     }
 
+    /**
+     * 处理 替换文本
+     */
     @Test
-    public void testForCamelCase() {
+    public void clearReplaceText(){
+        ReplaceUtils.recursionWithAction(replaceFile, new SimpleReplaceFileAction(".*\\..*\\.", ""));
+    }
+
+
+    @Test
+    public void testForCamelCase() throws IOException {
         String s = "abc_dev_";
         System.out.println(ReplaceUtils.kebabCaceToUpperCamelCase(s));
+
+
+        FileInputStream fileInputStream  = new FileInputStream(replaceFile);
+        String str = new String(fileInputStream.readAllBytes(), StandardCharsets.UTF_8);
+
+        System.out.println(str);
+
+
+
+
     }
 
 }
